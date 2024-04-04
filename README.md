@@ -11,7 +11,7 @@ Please join the workshop with a computer that has the following installed (all a
 -   The following R packages, which you can install from the R console:
 
 ```         
-pkgs <- c("tidyverse", "shiny", "bslib", "deSolve")
+pkgs <- c("tidyverse", "shiny", "bslib", "deSolve", "plotly")
 
 install.packages(pkgs)
 ```
