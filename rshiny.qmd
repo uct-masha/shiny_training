@@ -1,0 +1,480 @@
+---
+title: "Building Web Interfaces for Effective Model Communication, Exploration and Debugging"
+institute: "The Modelling and Simulation Hub, Africa (MASHA)"
+footer: "science.uct.ac.za/masha"
+date: 04-18-2024
+author: "Retselisitsoe Monyake"
+center-title-slide: false
+title-slide-attributes:
+  data-background-image: images/africa.png
+  data-background-size: contain
+  data-background-opacity: "0.7"
+date-format: long
+execute:
+  echo: true
+  message: true
+  warning: true
+  error: true
+format: 
+  revealjs:
+    background-size: cover
+    logo: images/logo_masha.png
+    theme: [default, custom.scss]
+    fontsize: 1.8em
+editor: source
+mainfont: "Schibsted Grotesk"
+---
+
+## Introductions 
+
+:::{layout-ncol=2}
+
+![Retselisitsoe Monyake: Research Software Engineer, MASHA](images/rmonyake.png)
+
+![Prof Sheetal Silal: Director, MASHA](images/ssilal.png)
+
+::::
+## Session overview 
+
+- MASHA overview    
+- Introduction to Shiny
+- Reactive programming in shiny
+- Basic shiny app
+- Integrating a model into a shiny app
+- Using the shiny app to debug and test model assumptions
+- Sharing your work (Deployment)
+
+## MASHA {background-image="images/masha-interdisciplinary.png"}
+
+**Policy-relevant modelling of infectious diseases**
+
+- **Interdisciplinary by nature**: 
+  - Mathematics, Computer science, Biology, Medicine, Economics, Finance, Public health
+- **Disease scope**
+  - Malaria, COVID-19, Hepatitis A, Syphilis
+  - Diphtheria, Tetanus, Pertussis
+- **Geographic scope**
+  - South Africa (30%), LMIC (70%)
+- **Methods**
+  - Compartmental modelling, Agent-based modelling
+  - Mathematical optimization, Data Science and Statistics
+
+## MASHA
+
+Building tools to communicate modelling findings
+
+![](images/masha-apps.png){fig-align="center"}
+
+## What is Shiny
+
+Shiny is an R package that makes it easy to build interactive web applications (apps) straight from R.
+
+![](images/dtp-app.png){fig-align="center"}
+
+## Why Shiny
+
+Shiny allows you to take your work in **`R`** and expose it via a **web browser** so that anyone can use it.
+
+![](images/code-to-app.png){fig-align="center"}
+
+## Structure of a Shiny App {auto-animate="true"}
+
+Shiny apps are contained in a single script called `app.R`.
+
+## Structure of a Shiny App {auto-animate="true"}
+
+Shiny apps are contained in a single script called `app.R`.
+
+The script `app.R` has three components:
+
+```{r}
+#| eval: false
+
+library(shiny)
+
+ui <- fluidPage() # <1>
+  
+server <- function(input, output, session) {} # <2>
+
+shinyApp(ui, server) # <3>
+
+```
+
+1.  a user interface (`ui`) object
+2.  a `server` function
+3.  a call to the `shinyApp` function
+
+## Structure of a Shiny App
+
+-   The user interface (`ui`) object controls the layout and appearance of the app.
+
+## Structure of a Shiny App
+
+-   The user interface (`ui`) object controls the layout and appearance of the app.
+-   The `server` function contains the logic/instructions that define how the app works.
+
+## Structure of a Shiny App
+
+-   The user interface (`ui`) object controls the layout and appearance of the app.
+-   The `server` function contains the logic/instructions that define how the app works.
+-   Finally the `shinyApp` function creates Shiny app objects from an explicit `UI/server` pair.
+
+## The user interface (UI) {auto-animate="true"}
+
+The UI generally consists of `inputs` and `outputs` organised inside a `page layout` function.
+
+## The user interface (UI) {auto-animate="true"}
+
+The UI generally consists of `inputs` and `outputs` organised inside a `page layout` function.
+
+### Page Layouts
+
+-   Layout functions provide the high-level visual structure of an app.
+
+## The user interface (UI) {auto-animate="true"}
+
+The UI generally consists of `inputs` and `outputs` organised inside a `page layout` function.
+
+### Page Layouts
+
+-   Layout functions provide the high-level visual structure of an app.
+
+-   Shiny apps typically use the function `fluidPage()` to create the layout.
+
+## The user interface (UI) {auto-animate="true"}
+
+The UI generally consists of `inputs` and `outputs` organised inside a `page layout` function.
+
+### Page Layouts
+
+-   Layout functions provide the high-level visual structure of an app.
+
+-   Shiny apps typically use the function `fluidPage()` to create the layout.
+
+-   In addition to `fluidPage()`, shiny provides a couple of other page functions such as `fixedPage()`, `fillPage()` and `navbarPage()`.
+
+## The user interface (UI)
+
+### bslib
+
+-   Shiny comes with another package, `bslib`, which we’ll also use to build great looking user interfaces.
+
+## The user interface (UI)
+
+### bslib
+
+-   Shiny comes with another package, `bslib`, which we’ll also use to build great looking user interfaces.
+
+-   `bslib` integrates seamlessly with the `shiny` package and makes it straightforward to create visually appealing Shiny applications with a custom look and feel.
+
+## The user interface (UI)
+
+### bslib
+
+-   Shiny comes with another package, `bslib`, which we’ll also use to build great looking user interfaces.
+
+-   `bslib` integrates seamlessly with the `shiny` package and makes it straightforward to create visually appealing Shiny applications with a custom look and feel.
+
+-   It helps overcome some of the limitations of the default styling in Shiny apps.
+
+## bslib layouts
+
+### Page layouts
+
+-   `page_sidebar()`: Creates a page-level sidebar for the app.
+-   `page_fluid()`: A convenient wrapper for `shiny::fluidPage()`. Adjusts the app's content dynamically to the available screen width.
+-   `page_navbar()`: Sets up a multi-panel app with an optional sidebar that appears on every panel.
+
+## bslib layouts
+
+### Element layouts
+
+-   `layout_sidebar()`: Generates a floating sidebar layout component that can be used within a `ui` component.
+-   `layout_columns()`: Create responsive, column-based grid layouts, based on a 12-column grid.
+
+## bslib layouts
+
+### Navigation Containers:
+
+-   `navset_tab()`, `navset_card_tab()`, `navset_card_underline()`: These functions help create tabbed sections of content.
+
+-   `nav_panel()`: Add navigation panels to the app.
+
+## bslib layouts
+
+### Components
+
+-   `card()`: Group content into contained units. Cards are a common organising unit for modern user interfaces.
+
+-   `accordion()`: For grouping related input controls.
+
+-   `value_box()`: A special type of card that highlights a single piece of information.
+
+## Input controls {auto-animate="true"}
+
+All input functions have the same structural pattern:
+
+## Input controls {auto-animate="true"}
+
+All input functions have the same structural pattern:
+
+-   The first argument is an `inputId`. This is the identifier used to connect the `input` with the `server`: If the UI has an input with ID `"name"`, the server function will access it with `input$name`.
+
+## Input controls {auto-animate="true"}
+
+All input functions have the same structural pattern:
+
+-   The first argument is an `inputId`. This is the identifier used to connect the `input` with the `server`: If the UI has an input with ID `"name"`, the server function will access it with `input$name`.
+
+-   Most input functions have a second parameter called `label`. This is used to create a reader-friendly label for the control.
+
+## Input controls {auto-animate="true"}
+
+All input functions have the same structural pattern:
+
+-   The first argument is an `inputId`. This is the identifier used to connect the `input` with the `server`: If the UI has an input with ID `"name"`, the server function will access it with `input$name`.
+
+-   Most input functions have a second parameter called `label`. This is used to create a reader-friendly label for the control.
+
+-   The third parameter is typically `value`, which, where possible, lets you set the default value. The remaining parameters are unique to the control.
+
+## Outputs {auto-animate="true"}
+
+-   Outputs in the UI create place holders that are later filled by the server function. Instead of an `inputId`, outputs take an `outputId`. If the UI has an output with ID `plot`, it can be accessed in the server function with `output$plot` .
+
+## Outputs {auto-animate="true"}
+
+-   Outputs in the UI create place holders that are later filled by the server function. Instead of an `inputId`, outputs take an `outputId`. If the UI has an output with ID `plot`, it can be accessed in the server function with `output$plot` .
+
+-   Each `output` function in the UI has a corresponding `render` function in the server function.
+
+## Outputs {auto-animate="true"}
+
+-   Outputs in the UI create place holders that are later filled by the server function. Instead of an `inputId`, outputs take an `outputId`. If the UI has an output with ID `plot`, it can be accessed in the server function with `output$plot` .
+
+-   Each `output` function in the UI has a corresponding `render` function in the server function.
+
+-   There are three main types of output:
+
+    -   `plots`
+    -   `tables`
+    -   `text`
+    
+
+
+## Basic reactivity
+
+-   In Shiny, reactive programming primarily occurs within the `server` function.
+
+-   Server functions accept three parameters: `input`, `output`, and `session`.
+
+```{r}
+#| eval: false
+
+server <- function(input, output, session) {
+  # app logic is defined in here.
+}
+```
+
+## Basic reactivity {auto-animate="true"}
+
+### Input
+
+The input argument is a list-like object that contains all the input data sent from the browser, named according to the input ID.
+
+## Basic reactivity {auto-animate="true"}
+
+### Input
+
+The input argument is a list-like object that contains all the input data sent from the browser, named according to the input ID.
+
+For example, if the UI contains a numeric input control with an input ID of `count`:
+
+```{r}
+#| eval: false
+
+ui <- page_fluid(
+  numericInput(inputId = "count", label = "Number of values", value = 100)
+)
+```
+
+The value of the input can be accessed with `input$count` in the server function. It will initially contain the value 100, and it will be automatically updated as the user changes the value in the browser.
+
+## Basic reactivity
+
+### Input
+
+Unlike a typical list, `input` objects are read-only. If you attempt to modify an input inside the server function, you’ll get an error:
+
+```{r}
+#| eval: false
+
+server <- function(input, output, session) {
+  input$count <- 10  
+}
+
+shinyApp(ui, server)
+#> Error: Can't modify read-only reactive value 'count'
+```
+
+## Basic reactivity
+
+### Input
+
+To read from an `input`, you must be in a **reactive context** created by a `render` function like `renderText()` or a reactive variable like `reactive()`.
+
+When attempting to read an input in Shiny, you’ll encounter an error if you’re not within a reactive context:
+
+```{r}
+#| eval: false
+
+server <- function(input, output, session) {
+  message("The total number of values is ", input$count)
+}
+
+shinyApp(ui, server)
+#> Error: Can't access reactive value 'count' outside of reactive consumer.
+#> ℹ Do you need to wrap inside reactive() or observer()?
+```
+
+## Basic reactivity
+
+### Output
+
+-   `output` is very similar to `input`: it's also a list-like object named according to the output ID. The main difference is that you use it for sending output instead of receiving input.
+-   The `output` object always has a corresponding `render` function:
+
+```{r}
+#| eval: false
+
+ui <- page_fluid(
+  textOutput(outputId = "greeting")
+)
+
+server <- function(input, output, session) {
+  output$greeting <- renderText("Hello there!")
+}
+```
+
+::: {.callout-note appearance="minimal"}
+Note that the ID is quoted in the UI, but not in the server.
+:::
+
+## Basic reactivity
+
+The **render function** does two things:
+
+-   It sets up a special reactive context that automatically tracks what `inputs` the `output` uses.
+-   It converts the `output` of your R code into HTML suitable for display on a web page.
+
+Shiny will return an error if you send `output` without the `render` function:
+
+```{r}
+#| eval: false
+
+server <- function(input, output, session) {
+  output$greeting <- "Hello there!"
+}
+shinyApp(ui, server)
+#> Error: Unexpected character object for output$greeting
+#> ℹ Did you forget to use a render function?
+```
+
+## Reactive expressions
+
+### What are reactive expressions?
+
+-   Reactive expressions are R expressions that take reactive inputs and return a value.
+-   They serve as a bridge between user inputs (like sliders, buttons, or text inputs) and the outputs (such as plots, tables, or text) in your Shiny app.
+-   When an input changes, the related reactive expressions automatically update their values.
+
+## Reactive expressions
+
+We will consider two reactive expressions:
+
+-   `reactive()`:
+    -   It allows you to define a computation that depends on reactive inputs (such as user interactions) and returns a value.
+    -   When any of its dependencies change, the reactive expression is automatically re-evaluated.
+-   `eventReactive()`:
+    -   The `eventReactive()` function is similar to `reactive()`, but with a specific trigger event.
+    -   It allows you to create a reactive expression that updates only when a specific event occurs (e.g., button click).
+
+## R scripts and data {auto-animate="true"}
+
+In most cases, you will have separate R scripts and data sets that you want to use in your app.
+
+## R scripts and data {auto-animate="true"}
+
+In most cases, you will have separate R scripts and data sets that you want to use in your app.
+
+**External R Scripts**
+
+-   Say you have a separate R script file (e.g., `helper_functions.R`) containing the functions or code you want to use in your Shiny app.
+-   In your Shiny app's `app.R` file, use the `source()` function to load the external R script file.
+
+```{r}
+#| eval: false
+
+source("helper_functions.R")
+
+ui <- page_fluid(
+  # ... UI code
+)
+
+server <- function(input, output) {
+  # Use functions from the external script
+}
+
+shinyApp(ui, server)
+```
+
+## R scripts and data {auto-animate="true"}
+
+In most cases, you will have separate R scripts and data sets that you want to use in your app.
+
+**External Data**
+
+-   Store your data in a suitable format (e.g., CSV, RDS, Excel) in a separate file or location.
+-   In your Shiny app's `app.R` file, read the data using the appropriate R function (e.g., `read.csv()`, `readRDS()`, `read_excel()`).
+
+```{r}
+#| eval: false
+# Read data from a CSV file
+my_data <- read_csv("data/my_data.csv")
+
+ui <- page_fluid(
+  # ... UI code
+)
+
+server <- function(input, output) {
+  # Use the data in your server logic
+}
+
+shinyApp(ui, server)
+```
+
+## R scripts and data {auto-animate="true"}
+
+In most cases, you will have separate R scripts and data sets that you want to use in your app.
+
+**Organizing Files**:
+
+* It's generally a good practice to organize your Shiny app files into a directory structure. 
+* For example, you can have a directory called `app` with subdirectories like `R` for R scripts and `data` for data files. Your `app.R` file can then source the external R scripts and read data files relative to the directory structure.
+
+## Resources to learn more
+
+* Shiny website (shiny.posit.co)
+* Mastering shiny on-line book (mastering-shiny.org)
+* bslib package website (rstudio.github.io/bslib/index.html)
+
+**Contact**
+
+* retselisitsoe.monyake@uct.ac.za
+* masha@uct.ac.za 
+
+## Training Evaluation Survey
+
+Please scan the following QR code and complete the survey.
+
+![](images/feedback.png){fig-align="center"}
